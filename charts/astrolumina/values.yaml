@@ -25,7 +25,7 @@ services:
   - name: frontend
     component: frontend
     image: astrolumina-frontend
-    containerPort: 80
+    containerPort: 8080
     servicePort: 80
     nodePort: 30080
     probePath: /

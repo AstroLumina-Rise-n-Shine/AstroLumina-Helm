@@ -5,7 +5,7 @@ egress only to same-namespace pods, CoreDNS and public HTTP(S) outside the
 private ranges. No podSelector on the kube-system rules on purpose: RKE2
 Traefik/CoreDNS pods are Helm-managed and carry none of our labels. */}}
 {{- $root := . }}
-{{- $appPorts := list 80 3031 3032 3033 }}
+{{- $appPorts := list 8080 3031 3032 3033 }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
