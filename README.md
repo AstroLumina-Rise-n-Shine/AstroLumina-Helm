@@ -80,6 +80,27 @@ idle `imageTags` entries (live read from `blueGreen.liveColors`, never
 flipped by the workflow); dev writes the per-service `devTags` entries
 (one version per service, no blue/green on dev).
 
+## Chart releases (OCI registry)
+
+Every merge to main touching `charts/**` packages the chart and pushes it to
+GitHub Container Registry as an OCI artifact
+(`oci://ghcr.io/astrolumina-by-carmen-ilie/charts/astrolumina`) via
+`.github/workflows/release-chart.yml` — GHCR *is* the Helm repository here,
+no extra server needed (OCI references are lowercase, hence the lowercase
+org name). Pull without cloning the repo:
+
+```bash
+helm pull oci://ghcr.io/astrolumina-by-carmen-ilie/charts/astrolumina --version 1.0.0
+```
+
+Release discipline: bump `version:` in `charts/astrolumina/Chart.yaml` to
+cut a release. Re-pushing an existing version fails (OCI tags are
+immutable) — bump instead of retrying. `appVersion` tracks the default app
+images; the actual pins stay in the values files, not in the release.
+ArgoCD keeps consuming the git path (`charts/astrolumina` + values files);
+the OCI artifact is for portability (other clusters, `helm pull`
+inspection), not a second source of truth.
+
 ## First boot on an empty cluster (3 phases, same as before)
 
 1. Install the release — pods boot on the placeholder Secrets.
