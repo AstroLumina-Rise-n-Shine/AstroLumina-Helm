@@ -84,13 +84,13 @@ flipped by the workflow); dev writes the per-service `devTags` entries
 
 Every merge to main touching `charts/**` packages the chart and pushes it to
 GitHub Container Registry as an OCI artifact
-(`oci://ghcr.io/astrolumina-by-carmen-ilie/charts/astrolumina`) via
+(`oci://ghcr.io/astrolumina-rise-n-shine/charts/astrolumina`) via
 `.github/workflows/release-chart.yml` — GHCR *is* the Helm repository here,
 no extra server needed (OCI references are lowercase, hence the lowercase
 org name). Pull without cloning the repo:
 
 ```bash
-helm pull oci://ghcr.io/astrolumina-by-carmen-ilie/charts/astrolumina --version 1.0.0
+helm pull oci://ghcr.io/astrolumina-rise-n-shine/charts/astrolumina --version 1.0.0
 ```
 
 Release discipline: bump `version:` in `charts/astrolumina/Chart.yaml` to
