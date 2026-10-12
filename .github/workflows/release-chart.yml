@@ -1,11 +1,11 @@
 name: Release Chart
 
 # Packages charts/astrolumina and pushes it to GitHub Container Registry as
-# an OCI artifact (oci://ghcr.io/astrolumina-by-carmen-ilie/charts).
+# an OCI artifact (oci://ghcr.io/astrolumina-rise-n-shine/charts).
 # Answers the "can this chart live in a Helm repository" question: GHCR *is*
 # the repository -- no chartmuseum needed, `helm push/pull` speak OCI
 # natively. OCI references are lowercase, hence the lowercase org name below
-# (the GitHub org itself is AstroLumina-by-Carmen-Ilie).
+# (the GitHub org itself is AstroLumina-Rise-n-Shine).
 #
 # Release discipline: bump `version:` in charts/astrolumina/Chart.yaml, merge
 # to main, this workflow publishes astrolumina-<version>.tgz. Re-pushing an
@@ -38,4 +38,4 @@ jobs:
           echo "Releasing chart version: $ver"
           helm package charts/astrolumina -d /tmp/chartpkg
           echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
-          helm push "/tmp/chartpkg/astrolumina-$ver.tgz" oci://ghcr.io/astrolumina-by-carmen-ilie/charts
+          helm push "/tmp/chartpkg/astrolumina-$ver.tgz" oci://ghcr.io/astrolumina-rise-n-shine/charts

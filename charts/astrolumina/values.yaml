@@ -7,7 +7,7 @@
 # (Compose-style variable names — the frontend entrypoint injects them into
 # public/env.js, VITE_* names are NOT read by the image).
 image:
-  registry: ghcr.io/astrolumina-by-carmen-ilie
+  registry: ghcr.io/astrolumina-rise-n-shine
   # Ultimate fallback tag: dev prefers its per-service devTags (see
   # values-dev.yaml) and only uses this when a service has no entry there.
   # Staging and production pin per-color tags in values-staging/production.yaml
