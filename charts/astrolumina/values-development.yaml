@@ -1,9 +1,9 @@
 # Development environment. Single Deployment per service (no blue/green),
 # NodePort services straight to the LAN, no Traefik, permissive NetworkPolicy.
 environment: development
-namespace: astrolumina-dev
+namespace: astrolumina-development
 # Values file name (used by NOTES.txt upgrade hints).
-valuesFile: values-dev.yaml
+valuesFile: values-development.yaml
 # Phase out the placeholder Secrets after the Doppler sync is verified:
 # helm upgrade ... --set placeholderSecretsEnabled=false
 placeholderSecretsEnabled: true
@@ -70,7 +70,7 @@ networkPolicy:
 doppler:
   config: dev
   tokenSecret: doppler-token-dev
-  namePrefix: astrolumina-dev
+  namePrefix: astrolumina-development
 
 # Placeholder Secret values (02-secrets.yaml equivalent). Fake but
 # format-plausible so pods boot until Doppler syncs real values. Real

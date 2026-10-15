@@ -2,7 +2,7 @@
 # probes, HTTPS via the letsencrypt certResolver, HTTP->HTTPS redirect and
 # basic-auth on the Traefik dashboard. Live Stripe keys (placeholders here).
 environment: production
-namespace: astrolumina-prod
+namespace: astrolumina-production
 # Values file name (used by NOTES.txt upgrade hints).
 valuesFile: values-production.yaml
 # Phase out the placeholder Secrets after the Doppler sync is verified:

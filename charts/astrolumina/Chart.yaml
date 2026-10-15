@@ -5,5 +5,5 @@ type: application
 version: 1.0.0
 appVersion: "latest"
 # One release per environment, each with its own values file:
-#   helm install astrolumina-dev ./charts/astrolumina -f charts/astrolumina/values-dev.yaml
+#   helm install astrolumina-development ./charts/astrolumina -f charts/astrolumina/values-development.yaml
 # See the repo README.md for the full runbook.
