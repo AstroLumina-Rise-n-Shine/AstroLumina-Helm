@@ -1,6 +1,6 @@
 # Shared defaults for the astrolumina chart. Environment-specific settings
 # (namespace, replicas, probes, Traefik, placeholder secret values, Doppler
-# project config) live in values-dev/staging/production.yaml. This file holds
+# project config) live in values-development/staging/production.yaml. This file holds
 # what is IDENTICAL across environments: the service catalog, container
 # image registry, resource budgets and the full secretKeyRef env wiring per
 # service
@@ -9,7 +9,7 @@
 image:
   registry: ghcr.io/astrolumina-rise-n-shine
   # Ultimate fallback tag: dev prefers its per-service devTags (see
-  # values-dev.yaml) and only uses this when a service has no entry there.
+  # values-development.yaml) and only uses this when a service has no entry there.
   # Staging and production pin per-color tags in values-staging/production.yaml
   # (imageTags), mirroring the Compose versions.env files.
   tag: latest

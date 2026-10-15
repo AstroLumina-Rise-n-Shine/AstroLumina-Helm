@@ -10,7 +10,7 @@
 # with a version are touched.
 #
 # Per-env logic (blue-green awareness):
-# - dev: tags live in the per-service `devTags` map in values-dev.yaml (no
+# - dev: tags live in the per-service `devTags` map in values-development.yaml (no
 #   blue/green on dev). Each given version is written to its own service
 #   entry; the template falls back to the global `image.tag` only for
 #   services with no devTags entry.
@@ -96,7 +96,7 @@ jobs:
 
           env_in = os.environ["INPUT_ENV"]
           values_file = {
-              "development": "charts/astrolumina/values-dev.yaml",
+              "development": "charts/astrolumina/values-development.yaml",
               "staging": "charts/astrolumina/values-staging.yaml",
               "production": "charts/astrolumina/values-production.yaml",
           }[env_in]
@@ -124,7 +124,7 @@ jobs:
                   values = yaml.safe_load(f)
               dev_tags = values.get("devTags")
               assert isinstance(dev_tags, dict), (
-                  "values-dev.yaml has no devTags map")
+                  "values-development.yaml has no devTags map")
               for svc in specified:
                   assert svc in dev_tags, (
                       f"devTags has no entry for service {svc!r}")

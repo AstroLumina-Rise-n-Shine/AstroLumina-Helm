@@ -12,7 +12,7 @@ output is functionally identical to the former Kustomize manifests in
 charts/astrolumina/
   Chart.yaml
   values.yaml                  # shared service catalog (images, resources, env wiring)
-  values-dev.yaml              # development (NodePort, no Traefik)
+  values-development.yaml              # development (NodePort, no Traefik)
   values-staging.yaml          # staging (blue/green, HTTP Traefik)
   values-production.yaml       # production (blue/green, HTTPS + dashboard auth)
   templates/
@@ -34,21 +34,21 @@ charts/astrolumina/
 One release per environment, each with its own values file:
 
 ```bash
-helm install astrolumina-dev ./charts/astrolumina \
-  -f charts/astrolumina/values-dev.yaml
+helm install astrolumina-development ./charts/astrolumina \
+  -f charts/astrolumina/values-development.yaml
 
 helm install astrolumina-staging ./charts/astrolumina \
   -f charts/astrolumina/values-staging.yaml
 
-helm install astrolumina-prod ./charts/astrolumina \
+helm install astrolumina-production ./charts/astrolumina \
   -f charts/astrolumina/values-production.yaml
 ```
 
 Dry-run against the old manifests any time:
 
 ```bash
-helm template astrolumina-dev ./charts/astrolumina \
-  -f charts/astrolumina/values-dev.yaml
+helm template astrolumina-development ./charts/astrolumina \
+  -f charts/astrolumina/values-development.yaml
 ```
 
 Blue-green switch (staging/production -- flips one `*-live` selector,
@@ -69,7 +69,7 @@ carries any `*_DOCKER_IMAGE_TAG` keys). Dev falls back to `image.tag`
 (still overridable per run with `--set`):
 
 ```bash
-helm upgrade astrolumina-prod ./charts/astrolumina \
+helm upgrade astrolumina-production ./charts/astrolumina \
   -f charts/astrolumina/values-production.yaml \
   --set imageTags.blue.frontend=<new-tag> --set imageTags.green.frontend=<new-tag>
 ```
@@ -120,7 +120,7 @@ helm upgrade <release> ./charts/astrolumina -f charts/astrolumina/<values-file> 
 - The `doppler-token-*` ServiceToken Secret in `doppler-operator-system`.
 - The real `ghcr-secret` docker-registry Secret (chart ships a placeholder
   only — a pull secret cannot be synced by the Doppler operator).
-- The `traefik-dashboard-auth` Secret in `astrolumina-prod` (htpasswd
+- The `traefik-dashboard-auth` Secret in `astrolumina-production` (htpasswd
   `users` line for the dashboard basicAuth middleware).
 - The RKE2 `HelmChartConfig` enabling Traefik + the `letsencrypt`
   certResolver (production prerequisite).
