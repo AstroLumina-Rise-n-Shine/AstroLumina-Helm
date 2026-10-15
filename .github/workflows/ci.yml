@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install yamllint==1.38.0
-      - run: yamllint charts/astrolumina/Chart.yaml charts/astrolumina/values.yaml charts/astrolumina/values-dev.yaml charts/astrolumina/values-staging.yaml charts/astrolumina/values-production.yaml
+      - run: yamllint charts/astrolumina/Chart.yaml charts/astrolumina/values.yaml charts/astrolumina/values-development.yaml charts/astrolumina/values-staging.yaml charts/astrolumina/values-production.yaml
 
   # Chart lint plus a full render per environment. Rendered output is kept
   # for the schema and policy jobs below.
@@ -41,7 +41,7 @@ jobs:
       - name: Lint and render all environments
         run: |
           mkdir -p /tmp/helmrender
-          for env in dev staging production; do
+          for env in development staging production; do
             helm lint "$CHART" --values "$CHART/values-$env.yaml"
             helm template release "$CHART" --values "$CHART/values-$env.yaml" --namespace "astrolumina-$env" > "/tmp/helmrender/$env.yaml"
           done
@@ -66,7 +66,7 @@ jobs:
           curl -sL -o kubeconform.tar.gz
           "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz"
           && tar xzf kubeconform.tar.gz kubeconform && sudo install kubeconform /usr/local/bin/kubeconform
-      - run: kubeconform -summary -skip DopplerSecret,IngressRoute,Middleware /tmp/helmrender/dev.yaml
+      - run: kubeconform -summary -skip DopplerSecret,IngressRoute,Middleware /tmp/helmrender/development.yaml
       - run: kubeconform -summary -skip DopplerSecret,IngressRoute,Middleware /tmp/helmrender/staging.yaml
       - run: kubeconform -summary -skip DopplerSecret,IngressRoute,Middleware /tmp/helmrender/production.yaml
 
@@ -86,7 +86,7 @@ jobs:
           curl -sL -o kube-linter.tar.gz
           "https://github.com/stackrox/kube-linter/releases/download/${KUBELINTER_VERSION}/kube-linter-linux.tar.gz"
           && tar xzf kube-linter.tar.gz kube-linter && sudo install kube-linter /usr/local/bin/kube-linter
-      - run: kube-linter lint --config .kube-linter.yaml --format plain /tmp/helmrender/dev.yaml
+      - run: kube-linter lint --config .kube-linter.yaml --format plain /tmp/helmrender/development.yaml
       - run: kube-linter lint --config .kube-linter.yaml --format plain /tmp/helmrender/staging.yaml
       - run: kube-linter lint --config .kube-linter.yaml --format plain /tmp/helmrender/production.yaml
 

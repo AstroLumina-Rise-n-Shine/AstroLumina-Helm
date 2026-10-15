@@ -1,6 +1,6 @@
 # Shared defaults for the astrolumina chart. Environment-specific settings
 # (namespace, replicas, probes, Traefik, placeholder secret values, Doppler
-# project config) live in values-dev/staging/production.yaml. This file holds
+# project config) live in values-development/staging/production.yaml. This file holds
 # what is IDENTICAL across environments: the service catalog, container
 # image registry, resource budgets and the full secretKeyRef env wiring per
 # service
