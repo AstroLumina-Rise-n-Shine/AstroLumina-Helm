@@ -1,5 +1,5 @@
 # Shared defaults for the astrolumina chart. Environment-specific settings
-# (namespace, replicas, probes, Traefik, placeholder secret values, Doppler
+# (namespace, replicas, probes, Traefik, Doppler
 # project config) live in values-development/staging/production.yaml. This file holds
 # what is IDENTICAL across environments: the service catalog, container
 # image registry, resource budgets and the full secretKeyRef env wiring per
@@ -20,7 +20,7 @@ image:
 # Kustomize deployments (name -> key, plus `optional: true` where the
 # originals set it). Each service also carries its explicit `dopplerSync`
 # key list (order matches the original 01-doppler-secrets.yaml), so the
-# placeholder Secrets and the DopplerSecret manifests both use these keys.
+# DopplerSecret manifests always carry exactly these keys.
 services:
   - name: frontend
     component: frontend

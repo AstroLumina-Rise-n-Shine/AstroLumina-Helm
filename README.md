@@ -17,9 +17,9 @@ charts/astrolumina/
   values-production.yaml       # production (blue/green, HTTPS + dashboard auth)
   templates/
     namespace.yaml             # Namespace
-    ghcr-secret.yaml           # ghcr placeholder (real secret is imperative, see below)
-    placeholder-secrets.yaml   # first-boot values until Doppler syncs
-    doppler-secrets.yaml       # DopplerSecret sync wiring
+    doppler-secrets.yaml       # DopplerSecret sync wiring (the ONLY secret
+                               # objects in git — the operator creates the
+                               # real Secrets; ghcr + token are imperative)
     deployments.yaml           # one per service (x blue/green on staging/prod)
     services.yaml              # NodePorts on dev, *-live ClusterIP on staging/prod
     hpa.yaml                   # 70
@@ -101,25 +101,20 @@ ArgoCD keeps consuming the git path (`charts/astrolumina` + values files);
 the OCI artifact is for portability (other clusters, `helm pull`
 inspection), not a second source of truth.
 
-## First boot on an empty cluster (3 phases, same as before)
+## First boot on an empty cluster (same as the Kustomize manifests)
 
-1. Install the release — pods boot on the placeholder Secrets.
+1. Install the release — pods wait for the Doppler operator to sync the
+   real values (this chart ships no Secret objects at all).
 2. Create the one-time token Secret and let the Doppler operator sync
-   real values (token name per env: `doppler-token-dev` / `-stg` / `-prd`;
+   (token name per env: `doppler-token-dev` / `-stg` / `-prd`;
    see `NOTES.txt` output after install for the exact commands).
-3. After the sync is verified, phase the placeholders out without
-   uninstalling:
-
-```bash
-helm upgrade <release> ./charts/astrolumina -f charts/astrolumina/<values-file> \
-  --set placeholderSecretsEnabled=false
-```
 
 ## NOT in this chart (imperative, once per cluster rebuild)
 
 - The `doppler-token-*` ServiceToken Secret in `doppler-operator-system`.
-- The real `ghcr-secret` docker-registry Secret (chart ships a placeholder
-  only — a pull secret cannot be synced by the Doppler operator).
+- The real `ghcr-secret` docker-registry Secret (never in git — a pull
+  secret cannot be synced by the Doppler operator, so it is created
+  imperatively).
 - The `traefik-dashboard-auth` Secret in `astrolumina-production` (htpasswd
   `users` line for the dashboard basicAuth middleware).
 - The RKE2 `HelmChartConfig` enabling Traefik + the `letsencrypt`
@@ -127,9 +122,8 @@ helm upgrade <release> ./charts/astrolumina -f charts/astrolumina/<values-file> 
 
 ## Deliberate normalizations vs the Kustomize originals
 
-- Placeholder Secrets and Deployments use `app.kubernetes.io/component`
-  everywhere; the old dev Secrets used `app.kubernetes.io/name` instead.
-- Rendered `stringData` values are always quoted; parsed values are equal.
+- Deployments use `app.kubernetes.io/component` everywhere; the old dev
+  Secrets used `app.kubernetes.io/name` instead.
 - The stale `# 3 replicas` comment on staging Deployments (which actually
   run 1 replica) was dropped; replicas come from values.
 
@@ -168,5 +162,5 @@ there are no ConfigMaps.
 was compared field-by-field against the original manifests: resource
 inventory, replicas, images, full `secretKeyRef` env wiring (name/key/
 optional), probes, resources, affinity, selectors, labels, service ports,
-HPA bounds/metrics/targets, Doppler sync key sets, placeholder values,
+HPA bounds/metrics/targets, Doppler sync key sets,
 NetworkPolicy, middlewares and IngressRoutes — all equal.

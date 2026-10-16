@@ -110,8 +110,8 @@ jobs:
           sarif_file: trivy-results.sarif
 
   # Secret scan with the pinned OSS binary (the official action needs a paid
-  # license on org repos). Full-history scan; the chart placeholder secret
-  # is allowlisted in .gitleaks.toml.
+  # license on org repos). Full-history scan; key-name false positives are
+  # allowlisted in .gitleaks.toml.
   gitleaks:
     runs-on: ubuntu-latest
     steps:
