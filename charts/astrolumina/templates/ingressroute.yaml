@@ -2,8 +2,9 @@
 host, /api/* prefixes stripped before the apps, traffic to the *-live
 Services. RKE2 Traefik only processes routes carrying the ingress.class
 annotation (the installed CRD schema has no ingressClassName field).
-Production adds the HTTP->HTTPS redirect route and TLS via the letsencrypt
-certResolver; the dashboard twin lives on websecure + basicAuth there. */}}
+Production serves HTTPS only (no plain HTTP at all) plus TLS via the
+letsencrypt certResolver; the dashboard twin lives on websecure + basicAuth
+there. */}}
 {{- if .Values.traefik.enabled }}
 {{- $host := .Values.traefik.host }}
 ---
@@ -19,20 +20,12 @@ metadata:
     environment: {{ .Values.environment }}
 spec:
   entryPoints:
-    - web
-{{- if .Values.traefik.tls }}
+    {{- if .Values.traefik.tls }}
     - websecure
-{{- end }}
+    {{- else }}
+    - web
+    {{- end }}
   routes:
-{{- if .Values.traefik.redirectHttp }}
-    - match: Host(`{{ $host }}`)
-      kind: Rule
-      middlewares:
-        - name: to-https
-      services:
-        - name: noop@internal
-          kind: TraefikService
-{{- end }}
     - match: Host(`{{ $host }}`) && PathPrefix(`/api/astrology`)
       kind: Rule
       middlewares:

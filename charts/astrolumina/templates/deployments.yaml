@@ -38,6 +38,25 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ $root.Values.image.pullSecret }}
+      {{- $runUser := 1001 }}
+      {{- if eq $svc.name "frontend" }}{{ $runUser = 101 }}{{ end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: {{ $runUser }}
+        runAsGroup: {{ $runUser }}
+      volumes:
+        - name: tmp-vol
+          emptyDir: {}
+        {{- if eq $svc.name "frontend" }}
+        - name: nginx-logs
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        {{- end }}
       {{- if $node }}
       affinity:
         nodeAffinity:
@@ -56,6 +75,25 @@ spec:
           {{- if and (not $color) $root.Values.devTags (hasKey $root.Values.devTags $svc.name) }}{{ $tag = index $root.Values.devTags $svc.name }}{{ end }}
           image: {{ $root.Values.image.registry }}/{{ $svc.image }}:{{ $tag }}
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            {{- if ne $svc.name "frontend" }}
+            readOnlyRootFilesystem: true
+            {{- end }}
+          volumeMounts:
+            - name: tmp-vol
+              mountPath: /tmp
+            {{- if eq $svc.name "frontend" }}
+            - name: nginx-logs
+              mountPath: /var/log/nginx
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ $svc.containerPort }}
