@@ -26,9 +26,9 @@ blueGreen:
 # template prefers these over the global image.tag fallback from values.yaml,
 # so each service can be deployed at its own version.
 devTags:
-  frontend: 2.0.11
-  astrology-api: 2.0.13
-  booking-api: 2.0.10
+  frontend: 2.0.15
+  astrology-api: 2.0.16
+  booking-api: 2.0.11
   payment-api: 2.0.11
 
 replicas: 1
