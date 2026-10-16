@@ -3,7 +3,9 @@
 # project config) live in values-development/staging/production.yaml. This file holds
 # what is IDENTICAL across environments: the service catalog, container
 # image registry, resource budgets and the full secretKeyRef env wiring per
-# service
+# service. Budgets are sized for the 2 GB lab workers: actual usage is
+# ~100Mi per API pod and ~5Mi for nginx, so limits sit just above reality
+# (blue+green x replicas must fit two workers alongside ArgoCD + system).
 # (Compose-style variable names — the frontend entrypoint injects them into
 # public/env.js, VITE_* names are NOT read by the image).
 image:
@@ -31,10 +33,10 @@ services:
     probePath: /
     requests:
       cpu: 25m
-      memory: 32Mi
+      memory: 16Mi
     limits:
-      cpu: 500m
-      memory: 128Mi
+      cpu: 200m
+      memory: 64Mi
     env:
       - name: NODE_ENV
         key: NODE_ENV
@@ -124,10 +126,10 @@ services:
     probePath: /health
     requests:
       cpu: 50m
-      memory: 96Mi
+      memory: 64Mi
     limits:
-      cpu: 500m
-      memory: 256Mi
+      cpu: 300m
+      memory: 128Mi
     env:
       - name: NODE_ENV
         key: NODE_ENV
@@ -212,10 +214,10 @@ services:
     probePath: /health
     requests:
       cpu: 50m
-      memory: 96Mi
+      memory: 64Mi
     limits:
-      cpu: 500m
-      memory: 256Mi
+      cpu: 300m
+      memory: 128Mi
     env:
       - name: NODE_ENV
         key: NODE_ENV
@@ -312,10 +314,10 @@ services:
     probePath: /health
     requests:
       cpu: 50m
-      memory: 96Mi
+      memory: 64Mi
     limits:
-      cpu: 500m
-      memory: 256Mi
+      cpu: 300m
+      memory: 128Mi
     env:
       - name: NODE_ENV
         key: NODE_ENV
