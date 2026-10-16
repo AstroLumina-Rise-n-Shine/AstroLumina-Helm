@@ -29,12 +29,12 @@ on your laptop, kubectl on the control plane over ssh):
   - doppler-token ServiceToken Secret in doppler-operator-system
     (referenced as {{ .Values.doppler.tokenSecret }})
   - real {{ .Values.image.pullSecret }} docker-registry Secret in
-    {{ .Values.namespace }} (chart ships a placeholder only)
+    {{ .Values.namespace }} (a pull secret cannot be synced by the Doppler
+    operator, so it is created imperatively and never shipped in git)
 {{- if .Values.traefik.dashboardAuth }}
   - traefik-dashboard-auth Secret in {{ .Values.namespace }}
     (htpasswd users line for the dashboard basicAuth middleware)
 {{- end }}
-First boot runs on the placeholder Secrets; after the Doppler sync is
-verified, disable them without uninstalling via:
-  helm upgrade <release> ./charts/astrolumina -f charts/astrolumina/{{ .Values.valuesFile }} \
-    --set placeholderSecretsEnabled=false
+On first boot the pods wait for the Doppler operator to sync the real
+values (same as the Kustomize manifests — this chart ships no Secret
+objects at all).

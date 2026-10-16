@@ -2,12 +2,9 @@
 # The base rule set still applies; the global allowlist below covers only
 # proven false positives (no real secret is committed in this repo).
 [allowlist]
-description = "Placeholders and key-name false positives (see comments)"
+description = "Key-name false positives (see comments)"
 regexTarget = "line"
 regexes = [
-  # Placeholder dockerconfigjson (base64 of "REPLACE_WITH_GITHUB_USER:REPLACE_WITH_GITHUB_TOKEN").
-  # The real ghcr-secret is created imperatively and never committed.
-  '''UkVQTEFDRV9XSVRIX0dJVEhVQl9VU0VSOlJFUExBQ0VfV0lUSF9HSVRIVUJfVE9LRU4=''',
   # secretKeyRef key names are bare uppercase identifiers, never secret values.
   # Example: "key: ASTROLOGY_API_K8S_URL" only names the Secret entry to read.
   '''key:\s+[A-Z][A-Z0-9_]+$''',
