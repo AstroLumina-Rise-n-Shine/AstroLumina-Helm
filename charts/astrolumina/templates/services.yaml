@@ -14,6 +14,10 @@ metadata:
 {{ include "astrolumina.labels" (list $svc "" $root) | indent 4 }}
 spec:
   type: NodePort
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
   ports:
     - name: http
       port: {{ $svc.servicePort }}
@@ -34,6 +38,10 @@ metadata:
 {{ include "astrolumina.labels" (list $svc "" $root) | indent 4 }}
 spec:
   type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
   ports:
     - name: http
       port: {{ $svc.servicePort }}

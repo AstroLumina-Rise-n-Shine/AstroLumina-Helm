@@ -38,5 +38,15 @@ spec:
           type: Utilization
           averageUtilization: {{ $mem }}
 {{- end }}
+{{- $rpm := index $root.Values.hpa.requestsPerMinute $svc.name }}
+{{- if $rpm }}
+    - type: Pods
+      pods:
+        metric:
+          name: api_requests_per_minute
+        target:
+          type: AverageValue
+          averageValue: "{{ $rpm }}"
+{{- end }}
 {{- end }}
 {{- end }}
