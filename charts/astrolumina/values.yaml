@@ -408,3 +408,49 @@ services:
       - FRONTEND_SERVER_K8S_PORT
       - FRONTEND_SERVER_K8S_DNS
     dopplerExtraKeys: []
+
+# HPA defaults shared/overridden per environment. min/max/target also live
+# in the values-<env>.yaml files. Optional per-pod Pods metric
+# (api_requests_per_minute, served by the prometheus-adapter): service
+# name -> averageValue; services without an entry (frontend) get no Pods
+# metric. Requests counted exclude /health.
+hpa:
+  minReplicas: 1
+  maxReplicas: 3
+  cpuUtilization: 70
+  memoryUtilization: {}
+  requestsPerMinute:
+    astrology-api: 20
+    booking-api: 20
+    payment-api: 20
+
+# Defaults so a bare `helm lint`/`helm template` (no -f values file)
+# renders. Every values-<env>.yaml sets the real values.
+exposure: NodePort
+blueGreen:
+  enabled: false
+  liveColors: {}
+networkPolicy:
+  strict: false
+namespace: astrolumina
+environment: development
+traefik:
+  enabled: false
+  host: ""
+  dashboardHost: ""
+  tls: false
+  redirectHttp: false
+  dashboardAuth: false
+  certResolver: letsencrypt
+  tlsDomain: ""
+doppler:
+  config: dev
+  tokenSecret: doppler-token-dev
+  namePrefix: astrolumina-dev
+probes:
+  frontend:
+    livenessDelay: 15
+    readinessDelay: 10
+  api:
+    livenessDelay: 15
+    readinessDelay: 10
