@@ -1,11 +1,14 @@
 {{/* NetworkPolicy. Dev is deliberately permissive (NodePorts are reached
-directly from the LAN, no Traefik). Staging/production only accept ingress
-from same-namespace pods and the RKE2 Traefik pods in kube-system, and
-egress only to same-namespace pods, CoreDNS and public HTTP(S) outside the
-private ranges. No podSelector on the kube-system rules on purpose: RKE2
-Traefik/CoreDNS pods are Helm-managed and carry none of our labels. */}}
+directly from the LAN, no Traefik). Staging/production accept ingress from
+same-namespace pods, the RKE2 Traefik pods in kube-system, and the
+monitoring-namespace Prometheus pods that scrape the API /metrics ports
+(ServiceMonitors), and egress only to same-namespace pods, CoreDNS and
+public HTTP(S) outside the private ranges. No podSelector on the kube-system
+rules on purpose: RKE2 Traefik/CoreDNS pods are Helm-managed and carry none
+of our labels. */}}
 {{- $root := . }}
 {{- $appPorts := list 8080 3031 3032 3033 }}
+{{- $metricsPorts := list 3031 3032 3033 }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -50,6 +53,19 @@ spec:
               kubernetes.io/metadata.name: kube-system
       ports:
 {{- range $p := $appPorts }}
+        - protocol: TCP
+          port: {{ $p }}
+{{- end }}
+    # Prometheus (monitoring namespace) scrapes the API /metrics ports via
+    # the ServiceMonitors. Only ports 3031-3033 are needed: the frontend
+    # on 8080 exposes no /metrics endpoint.
+    # NOTE: no podSelector here on purpose (see the Traefik rule above).
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+{{- range $p := $metricsPorts }}
         - protocol: TCP
           port: {{ $p }}
 {{- end }}
