@@ -1,7 +1,22 @@
-# Deliberate, reviewed exception — mirrors the raw manifests in AstroLumina-Kubernetes:
+# Deliberate, reviewed exceptions — mirrors the raw manifests in AstroLumina-Kubernetes:
 #   KSV-0014: the frontend container keeps a writable root filesystem because its
 #   entrypoint rewrites /usr/share/nginx/html/{env.js,index.html} with sed -i at
 #   container start. The three API containers DO set readOnlyRootFilesystem: true —
 #   do not weaken them. The same gap is tracked as an advisory finding in the
 #   Kubernetes repo (see its trivy-config step comment and .kube-linter.yaml).
 KSV-0014
+
+# Bare-render-only artifact: the CI scan renders the chart with NO -f values file,
+# so services render without pinned image tags. Every real environment pins tags
+# via values-<env>.yaml (imageTags per service/color).
+KSV-0013
+
+# The images come from our own org registry (ghcr.io/astrolumina-rise-n-shine/*);
+# ghcr.io is simply not on the check's built-in trusted-registry list.
+KSV-0125
+
+# Deliberate project-wide choice: containers run as UID/GID 1001 (frontend 101),
+# matching the raw manifests and Dockerfiles — far below the check's preferred
+# > 10000. Tracked as an advisory gap in the Kubernetes repo too (same UID/GID).
+KSV-0020
+KSV-0021
