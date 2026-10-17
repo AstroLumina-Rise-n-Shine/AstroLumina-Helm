@@ -1,0 +1,7 @@
+# Deliberate, reviewed exception — mirrors the raw manifests in AstroLumina-Kubernetes:
+#   KSV-0014: the frontend container keeps a writable root filesystem because its
+#   entrypoint rewrites /usr/share/nginx/html/{env.js,index.html} with sed -i at
+#   container start. The three API containers DO set readOnlyRootFilesystem: true —
+#   do not weaken them. The same gap is tracked as an advisory finding in the
+#   Kubernetes repo (see its trivy-config step comment and .kube-linter.yaml).
+KSV-0014
