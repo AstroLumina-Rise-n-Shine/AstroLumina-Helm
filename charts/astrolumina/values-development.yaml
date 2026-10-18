@@ -22,10 +22,10 @@ blueGreen:
 # template prefers these over the global image.tag fallback from values.yaml,
 # so each service can be deployed at its own version.
 devTags:
-  frontend: 2.0.15
-  astrology-api: 2.0.16
-  booking-api: 2.0.11
-  payment-api: 2.0.11
+  frontend: 2.0.16
+  astrology-api: 2.0.17
+  booking-api: 2.0.12
+  payment-api: 2.0.12
 
 replicas: 1
 
@@ -47,6 +47,10 @@ hpa:
   # frontend on memory; staging/production use CPU only.
   memoryUtilization:
     frontend: 75
+  # No prometheus-adapter on development (ArgoCD-only cluster): drop the
+  # inherited Pods metric so the HPAs stay CPU(+memory)-only instead of
+  # reporting a permanently-missing custom metric.
+  requestsPerMinute: null
 
 exposure: NodePort # dev reaches pods via NodePorts, no IngressRoutes
 
