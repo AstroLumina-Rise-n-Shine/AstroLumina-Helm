@@ -1,5 +1,8 @@
-{{/* HPAs: one per Deployment (per color on staging/production). CPU-only
-except the dev frontend, which also scales on memory. */}}
+{{/* HPAs: one per Deployment (per color on staging/production). CPU plus,
+when configured: a memory metric (dev frontend) and a per-pod requests/min
+Pods metric served by the prometheus-adapter (staging/production only:
+api_requests_per_minute for the APIs, frontend_requests_per_minute for the
+nginx frontend sidecar). */}}
 {{- $root := . }}
 {{- $colors := list "" }}
 {{- if .Values.blueGreen.enabled }}{{ $colors = list "blue" "green" }}{{ end }}
@@ -38,12 +41,15 @@ spec:
           type: Utilization
           averageUtilization: {{ $mem }}
 {{- end }}
-{{- $rpm := index $root.Values.hpa.requestsPerMinute $svc.name }}
+{{- $rpm := "" }}
+{{- if $root.Values.hpa.requestsPerMinute }}{{ $rpm = index $root.Values.hpa.requestsPerMinute $svc.name }}{{ end }}
 {{- if $rpm }}
+{{- $metricName := "api_requests_per_minute" }}
+{{- if eq $svc.name "frontend" }}{{ $metricName = "frontend_requests_per_minute" }}{{ end }}
     - type: Pods
       pods:
         metric:
-          name: api_requests_per_minute
+          name: {{ $metricName }}
         target:
           type: AverageValue
           averageValue: "{{ $rpm }}"

@@ -410,10 +410,11 @@ services:
     dopplerExtraKeys: []
 
 # HPA defaults shared/overridden per environment. min/max/target also live
-# in the values-<env>.yaml files. Optional per-pod Pods metric
-# (api_requests_per_minute, served by the prometheus-adapter): service
-# name -> averageValue; services without an entry (frontend) get no Pods
-# metric. Requests counted exclude /health.
+# in the values-<env>.yaml files. Optional per-pod Pods metric, served by
+# the prometheus-adapter: service name -> averageValue. The APIs scale on
+# api_requests_per_minute (counts exclude /health); the frontend scales on
+# frontend_requests_per_minute (nginx_http_requests_total, all requests).
+# Services without an entry get no Pods metric.
 hpa:
   minReplicas: 1
   maxReplicas: 3
@@ -423,6 +424,21 @@ hpa:
     astrology-api: 20
     booking-api: 20
     payment-api: 20
+
+# nginx-prometheus-exporter sidecar for the frontend: scrapes Nginx
+# stub_status on 127.0.0.1 and re-exposes nginx_http_requests_total etc.
+# on :9113 for the frontend ServiceMonitor. Staging/production only —
+# development runs ArgoCD alone (no monitoring), so it keeps this off.
+frontendMetrics:
+  enabled: false
+  image: docker.io/nginx/nginx-prometheus-exporter:1.4.1
+  port: 9113
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    cpu: 50m
+    memory: 32Mi
 
 # Defaults so a bare `helm lint`/`helm template` (no -f values file)
 # renders. Every values-<env>.yaml sets the real values.

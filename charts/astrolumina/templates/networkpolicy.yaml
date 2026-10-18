@@ -8,7 +8,7 @@ rules on purpose: RKE2 Traefik/CoreDNS pods are Helm-managed and carry none
 of our labels. */}}
 {{- $root := . }}
 {{- $appPorts := list 8080 3031 3032 3033 }}
-{{- $metricsPorts := list 3031 3032 3033 }}
+{{- $metricsPorts := list 3031 3032 3033 9113 }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -57,8 +57,8 @@ spec:
           port: {{ $p }}
 {{- end }}
     # Prometheus (monitoring namespace) scrapes the API /metrics ports via
-    # the ServiceMonitors. Only ports 3031-3033 are needed: the frontend
-    # on 8080 exposes no /metrics endpoint.
+    # the ServiceMonitors plus the frontend's nginx-prometheus-exporter
+    # sidecar on 9113 (Nginx stub_status). Port 8080 itself stays unscraped.
     # NOTE: no podSelector here on purpose (see the Traefik rule above).
     - from:
         - namespaceSelector:

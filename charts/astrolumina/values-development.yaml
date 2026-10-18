@@ -47,6 +47,10 @@ hpa:
   # frontend on memory; staging/production use CPU only.
   memoryUtilization:
     frontend: 75
+  # No prometheus-adapter on development (ArgoCD-only cluster): drop the
+  # inherited Pods metric so the HPAs stay CPU(+memory)-only instead of
+  # reporting a permanently-missing custom metric.
+  requestsPerMinute: null
 
 exposure: NodePort # dev reaches pods via NodePorts, no IngressRoutes
 

@@ -53,6 +53,15 @@ hpa:
   maxReplicas: 5
   cpuUtilization: 70
   memoryUtilization: {}
+  # Frontend scales on nginx requests/min (sidecar below -> adapter ->
+  # frontend_requests_per_minute); the API entries come from values.yaml.
+  requestsPerMinute:
+    frontend: 20
+
+# Nginx metrics for the frontend HPA + ServiceMonitor (sidecar scrapes
+# 127.0.0.1 stub_status and serves :9113 /metrics).
+frontendMetrics:
+  enabled: true
 
 exposure: live # traffic flows through the *-live ClusterIP Services
 

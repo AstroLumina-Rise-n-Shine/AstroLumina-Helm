@@ -132,6 +132,34 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 2
+        {{- if and (eq $svc.name "frontend") $root.Values.frontendMetrics.enabled }}
+        # nginx-prometheus-exporter sidecar: turns Nginx stub_status into
+        # Prometheus counters (nginx_http_requests_total, connections, ...)
+        # on :9113 — scraped by the frontend ServiceMonitor (staging and
+        # production only).
+        - name: nginx-metrics
+          image: {{ $root.Values.frontendMetrics.image }}
+          imagePullPolicy: IfNotPresent
+          args:
+            - -nginx.scrape-uri=http://127.0.0.1:{{ $svc.containerPort }}/stub_status
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          ports:
+            - name: metrics
+              containerPort: {{ $root.Values.frontendMetrics.port }}
+              protocol: TCP
+          resources:
+            requests:
+              cpu: {{ $root.Values.frontendMetrics.requests.cpu }}
+              memory: {{ $root.Values.frontendMetrics.requests.memory }}
+            limits:
+              cpu: {{ $root.Values.frontendMetrics.limits.cpu }}
+              memory: {{ $root.Values.frontendMetrics.limits.memory }}
+        {{- end }}
       restartPolicy: Always
 {{- end }}
 {{- end }}

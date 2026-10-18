@@ -47,6 +47,12 @@ spec:
       port: {{ $svc.servicePort }}
       targetPort: http
       protocol: TCP
+{{- if and (eq $svc.name "frontend") $root.Values.frontendMetrics.enabled }}
+    - name: metrics
+      port: {{ $root.Values.frontendMetrics.port }}
+      targetPort: metrics
+      protocol: TCP
+{{- end }}
   selector:
     app.kubernetes.io/name: {{ $svc.name }}
     app.kubernetes.io/component: {{ $svc.component }}
