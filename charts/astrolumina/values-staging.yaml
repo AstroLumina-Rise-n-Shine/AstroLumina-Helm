@@ -14,7 +14,7 @@ blueGreen:
   # per-service *-live selectors in Kubernetes and the per-router LIVE
   # markers in Compose). Flip one service line at a time.
   liveColors:
-    astrology-api: blue # LIVE
+    astrology-api: green # LIVE
     frontend: blue # LIVE
     payment-api: blue # LIVE
     booking-api: blue # LIVE
@@ -33,7 +33,7 @@ imageTags:
     payment-api: 2.0.12
     booking-api: 2.0.12
   green:
-    astrology-api: 2.0.17
+    astrology-api: 2.0.18
     frontend: 2.0.16
     booking-api: 2.0.12
     payment-api: 2.0.12
