@@ -63,11 +63,18 @@ jobs:
       pull-requests: write
     steps:
       - name: Require at least one version
+        # Keep workflow inputs in the environment rather than interpolating
+        # user-controlled values into the shell program.
+        env:
+          FRONTEND_VERSION: ${{ inputs.frontend_version }}
+          ASTROLOGY_VERSION: ${{ inputs.astrology_version }}
+          BOOKING_VERSION: ${{ inputs.booking_version }}
+          PAYMENT_VERSION: ${{ inputs.payment_version }}
         run: |
-          if [ -z "${{ inputs.frontend_version }}" ] \
-            && [ -z "${{ inputs.astrology_version }}" ] \
-            && [ -z "${{ inputs.booking_version }}" ] \
-            && [ -z "${{ inputs.payment_version }}" ]; then
+          if [ -z "$FRONTEND_VERSION" ] \
+            && [ -z "$ASTROLOGY_VERSION" ] \
+            && [ -z "$BOOKING_VERSION" ] \
+            && [ -z "$PAYMENT_VERSION" ]; then
             echo "At least one service version is required" >&2
             exit 1
           fi
@@ -209,10 +216,12 @@ jobs:
       - name: Commit to branch and open deploy PR
         env:
           GH_TOKEN: ${{ github.token }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          BRANCH="deploy/${{ inputs.environment }}-${{ github.run_number }}"
+          BRANCH="deploy/${DEPLOY_ENVIRONMENT}-${RUN_NUMBER}"
           # The deploy/* namespace is bot-owned: -B resets a stale branch
           # from an earlier failed run, and the force-push below only ever
           # overwrites the bot's own previous attempt, never human work.
@@ -224,7 +233,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nothing to commit (tags already at the requested versions)"
           else
-            git commit -m "deploy ${{ inputs.environment }}: bump image tags"
+            git commit -m "deploy ${DEPLOY_ENVIRONMENT}: bump image tags"
           fi
           if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
             echo "No changes vs main, skipping PR"
@@ -234,8 +243,8 @@ jobs:
               echo "PR already exists for $BRANCH, pushed update to it"
             else
               gh pr create --base main --head "$BRANCH" \
-                --title "deploy ${{ inputs.environment }}: bump image tags" \
-                --body "Manual deploy to ${{ inputs.environment }} (run ${{ github.run_number }}). Merge, then upgrade the release (or SYNC the ArgoCD Helm app) and flip traffic when ready." || {
+                --title "deploy ${DEPLOY_ENVIRONMENT}: bump image tags" \
+                --body "Manual deploy to ${DEPLOY_ENVIRONMENT} (run ${RUN_NUMBER}). Merge, then upgrade the release (or SYNC the ArgoCD Helm app) and flip traffic when ready." || {
                 echo "HINT: if the error above says 'GitHub Actions is not permitted" >&2
                 echo "to create or approve pull requests', enable 'Allow GitHub Actions" >&2
                 echo "to create and approve pull requests' under Settings -> Actions ->" >&2

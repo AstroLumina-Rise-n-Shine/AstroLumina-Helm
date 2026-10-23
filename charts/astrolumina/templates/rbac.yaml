@@ -1,0 +1,219 @@
+{{/* Optional namespaced human RBAC. Disabled by default: with
+rbac.enabled=false this file renders nothing at all, so existing releases are
+byte-identical. Namespaced Role + RoleBinding only (no ClusterRole/Binding, no
+ServiceAccount, no Secret access, no exec, no pod delete). Development
+additionally grants write verbs on the workload objects when
+rbac.developerWrite=true; staging keeps developers read-only and without
+ConfigMap access. Production never binds a human group (rbac.enabled=false in
+values-production.yaml).
+The group names must match the group claim issued by the cluster OIDC
+provider; mapping users into them is a cluster prerequisite (see README).
+Kept in sync with the plain manifests in the AstroLumina-Kubernetes RBAC PR. */}}
+{{- if .Values.rbac.enabled }}
+{{- $root := . }}
+{{- $namespace := $root.Values.namespace }}
+{{- $developerGroup := required "rbac.groups.developers is required when rbac.enabled=true" $root.Values.rbac.groups.developers }}
+{{- $testerGroup := required "rbac.groups.testers is required when rbac.enabled=true" $root.Values.rbac.groups.testers }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: astrolumina-developer
+  namespace: {{ $namespace }}
+  labels:
+    app.kubernetes.io/part-of: astrolumina
+    environment: {{ $root.Values.environment }}
+rules:
+  # Read the workloads and their runtime state (logs, port-forward, events).
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+      - pods/portforward
+      - services
+      - endpoints
+      - events
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+  # `kubectl port-forward` issues a create (POST) against the pods/portforward
+  # subresource; get/list/watch cannot authorise it. This opens a stream via the
+  # kubelet and cannot modify objects, exec into a container, or read Secrets.
+  - apiGroups:
+      - ""
+    resources:
+      - pods/portforward
+    verbs:
+      - create
+{{- if $root.Values.rbac.developerWrite }}
+  # Development only (rbac.developerWrite=true): redeploy, scale, restart and
+  # adjust network policy without cluster-admin. ConfigMaps are granted here
+  # together with their write verbs - staging developers get neither. Never
+  # Secrets, never exec and never pod deletion: a deleted pod cannot be
+  # recovered by its owner.
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - configmaps
+    verbs:
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - create
+      - update
+      - patch
+      - delete
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: astrolumina-developer
+  namespace: {{ $namespace }}
+  labels:
+    app.kubernetes.io/part-of: astrolumina
+    environment: {{ $root.Values.environment }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: astrolumina-developer
+subjects:
+  # Matches the value of the OIDC groups claim for an external developer.
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: {{ $developerGroup | quote }}
+---
+# Tester: the developer read surface without ConfigMaps and without any write
+# verb (the only mutating grant is the pods/portforward stream below).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: astrolumina-tester
+  namespace: {{ $namespace }}
+  labels:
+    app.kubernetes.io/part-of: astrolumina
+    environment: {{ $root.Values.environment }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+      - pods/portforward
+      - services
+      - endpoints
+      - events
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+  # Same port-forward note as the developer Role.
+  - apiGroups:
+      - ""
+    resources:
+      - pods/portforward
+    verbs:
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: astrolumina-tester
+  namespace: {{ $namespace }}
+  labels:
+    app.kubernetes.io/part-of: astrolumina
+    environment: {{ $root.Values.environment }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: astrolumina-tester
+subjects:
+  # Matches the value of the OIDC groups claim for an external tester.
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: {{ $testerGroup | quote }}
+{{- end }}
