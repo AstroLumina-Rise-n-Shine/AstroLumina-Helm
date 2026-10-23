@@ -9,11 +9,14 @@ jobs:
       image: semgrep/semgrep:1.182.0
     if: (github.actor != 'github-actions[bot]')
     steps:
-      - uses: actions/checkout@v4
-      - run: semgrep --config p/default --error --jobs 1 --sarif --output=semgrep.sarif || true
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Run Semgrep
+        id: semgrep
+        run: semgrep --config p/default --jobs 1 --sarif --output=semgrep.sarif
       - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && steps.semgrep.outcome == 'success'
+        uses: >-
+          github/codeql-action/upload-sarif@87ef0dc97def48aa960fbf026a2563ee9dbdb470
         with:
           sarif_file: semgrep.sarif
           category: semgrep
