@@ -1,0 +1,45 @@
+name: Semgrep
+on:
+  pull_request:
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  semgrep:
+    name: Semgrep OSS
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.182.0
+    if: (github.actor != 'github-actions[bot]')
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Run Semgrep
+        id: semgrep
+        run: semgrep --config p/default --jobs 1 --sarif --output=semgrep.sarif
+      - name: Remove suppressed findings from SARIF
+        id: filter_sarif
+        if: steps.semgrep.outcome == 'success'
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          sarif_path = Path("semgrep.sarif")
+          sarif = json.loads(sarif_path.read_text())
+          for run in sarif.get("runs", []):
+              run["results"] = [
+                  result
+                  for result in run.get("results", [])
+                  if not result.get("suppressions")
+              ]
+          sarif_path.write_text(json.dumps(sarif))
+          PY
+      - name: Upload SARIF to GitHub
+        if: >-
+          always() && steps.semgrep.outcome == 'success' &&
+          steps.filter_sarif.outcome == 'success'
+        uses: >-
+          github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep

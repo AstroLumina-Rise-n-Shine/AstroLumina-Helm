@@ -24,6 +24,8 @@ charts/astrolumina/
     services.yaml              # NodePorts on dev, *-live ClusterIP on staging/prod
     hpa.yaml                   # 70
     networkpolicy.yaml         # 60 (permissive on dev, strict otherwise)
+    rbac.yaml                  # optional namespaced developer/tester Role +
+                               # RoleBinding (dev/staging only, off by default)
     middlewares.yaml           # 51 (staging/prod only)
     ingressroute.yaml          # 52 (staging/prod only)
     NOTES.txt                  # post-install hints
@@ -79,6 +81,27 @@ choice + per-service versions, branch + PR): staging/production edit the
 idle `imageTags` entries (live read from `blueGreen.liveColors`, never
 flipped by the workflow); dev writes the per-service `devTags` entries
 (one version per service, no blue/green on dev).
+
+## Optional RBAC (development and staging only)
+
+`rbac.enabled` is `false` by default, so a release that does not opt in
+renders exactly as before (no Role/RoleBinding objects). Development and
+staging enable it; production keeps it off on purpose — there is no human
+RoleBinding in production.
+
+| Role | Scope | Permissions |
+| --- | --- | --- |
+| `astrolumina-developer` | namespace of the release | read pods (incl. `pods/log`, `pods/portforward`), services, endpoints, events, deployments, replicasets, HPA, NetworkPolicies; **development only** (`rbac.developerWrite=true`): read + create/update/patch/delete deployments, services, configmaps, HPA, NetworkPolicies |
+| `astrolumina-tester` | namespace of the release | read-only pods (incl. `pods/log`, `pods/portforward`), services, endpoints, deployments, replicasets, events, HPA, NetworkPolicies |
+
+No Secrets, no `pods/exec`, no pod deletion, and no ClusterRole/ClusterRoleBinding
+in any environment. The bindings target the groups in
+`rbac.groups.developers` / `rbac.groups.testers` (defaults
+`astrolumina:developers` / `astrolumina:testers`). Those names must match the
+group claim issued by the cluster OIDC provider (`--oidc-groups-claim`);
+creating the groups and mapping users is a cluster prerequisite, out of scope
+for this chart. The same roles ship as plain manifests in the companion
+`AstroLumina-Kubernetes` RBAC PR.
 
 ## Chart releases (OCI registry)
 

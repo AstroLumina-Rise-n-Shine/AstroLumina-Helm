@@ -78,6 +78,11 @@ traefik:
 networkPolicy:
   strict: true
 
+# No human RBAC in production on purpose (no RoleBinding, no group access);
+# changes go through the deployment workflow, never through kubectl.
+rbac:
+  enabled: false
+
 doppler:
   config: prd
   tokenSecret: doppler-token-prd

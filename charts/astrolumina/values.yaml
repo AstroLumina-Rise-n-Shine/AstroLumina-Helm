@@ -448,6 +448,25 @@ blueGreen:
   liveColors: {}
 networkPolicy:
   strict: false
+
+# Optional namespaced human RBAC (developer/tester groups). Off by default:
+# with rbac.enabled=false the rbac.yaml template renders nothing, so existing
+# releases are unchanged. Development/staging enable it, production keeps it
+# off on purpose (no human RoleBinding in production). Namespaced Role +
+# RoleBinding only; the chart never creates a ServiceAccount or a
+# ClusterRole/Binding, and never grants Secrets, exec or pod deletion.
+# The group names must match the group claim issued by the cluster OIDC
+# provider (kube-apiserver --oidc-groups-claim); mapping users into the groups
+# is a cluster prerequisite.
+rbac:
+  enabled: false
+  # Development only: let the developer group create/update/patch/delete
+  # Deployments, Services, ConfigMaps, HPAs and NetworkPolicies. Keep false
+  # everywhere else - staging and production developers stay read-only.
+  developerWrite: false
+  groups:
+    developers: astrolumina:developers
+    testers: astrolumina:testers
 namespace: astrolumina
 environment: development
 traefik:
