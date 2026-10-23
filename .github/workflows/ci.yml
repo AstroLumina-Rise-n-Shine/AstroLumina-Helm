@@ -1,12 +1,12 @@
 # CI for the Helm chart: lint, render, schema-check, scan.
-# Runs on every push and pull request. Uses the preinstalled Helm on the
+# Runs for pull requests targeting main. Uses the preinstalled Helm on the
 # GitHub runner (helm lint / helm template need no cluster).
 ---
-name: Helm CI
+name: CI
 
 on:
-  push:
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
