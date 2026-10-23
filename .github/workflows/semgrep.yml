@@ -1,7 +1,5 @@
 name: Semgrep
 on:
-  push:
-    branches: [main, feat/optional-rbac]
   pull_request:
 jobs:
   semgrep:
