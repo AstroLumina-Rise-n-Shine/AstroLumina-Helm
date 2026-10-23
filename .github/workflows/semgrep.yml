@@ -1,6 +1,9 @@
 name: Semgrep
 on:
   pull_request:
+permissions:
+  contents: read
+  security-events: write
 jobs:
   semgrep:
     name: Semgrep OSS
