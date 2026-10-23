@@ -39,7 +39,7 @@ jobs:
           always() && steps.semgrep.outcome == 'success' &&
           steps.filter_sarif.outcome == 'success'
         uses: >-
-          github/codeql-action/upload-sarif@87ef0dc97def48aa960fbf026a2563ee9dbdb470
+          github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370
         with:
           sarif_file: semgrep.sarif
           category: semgrep
