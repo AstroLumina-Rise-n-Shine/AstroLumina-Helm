@@ -67,6 +67,13 @@ traefik:
 networkPolicy:
   strict: false # permissive dev policy (see template)
 
+# Human RBAC for the dev namespace: the developer group may also write the
+# workload objects (no Secrets, no exec, no pod delete); testers are
+# read-only. The groups come from the OIDC group claim.
+rbac:
+  enabled: true
+  developerWrite: true
+
 doppler:
   config: dev
   tokenSecret: doppler-token-dev

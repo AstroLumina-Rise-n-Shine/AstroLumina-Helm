@@ -78,6 +78,12 @@ traefik:
 networkPolicy:
   strict: true
 
+# Human RBAC for the staging namespace: developers and testers both get the
+# read-only Role (no write verbs) - promote through git, not by hand.
+rbac:
+  enabled: true
+  developerWrite: false
+
 doppler:
   config: stg
   tokenSecret: doppler-token-stg
