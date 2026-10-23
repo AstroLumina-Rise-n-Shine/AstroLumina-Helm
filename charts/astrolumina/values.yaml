@@ -431,7 +431,7 @@ hpa:
 # development runs ArgoCD alone (no monitoring), so it keeps this off.
 frontendMetrics:
   enabled: false
-  image: docker.io/nginx/nginx-prometheus-exporter:1.4.1
+  image: docker.io/nginx/nginx-prometheus-exporter:1.5.3
   port: 9113
   requests:
     cpu: 10m
