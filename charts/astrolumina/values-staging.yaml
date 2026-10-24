@@ -14,10 +14,10 @@ blueGreen:
   # per-service *-live selectors in Kubernetes and the per-router LIVE
   # markers in Compose). Flip one service line at a time.
   liveColors:
-    astrology-api: green # LIVE
+    astrology-api: blue # LIVE
     frontend: blue # LIVE
-    payment-api: green # LIVE
-    booking-api: green # LIVE
+    payment-api: blue # LIVE
+    booking-api: blue # LIVE
   nodeNames:
     blue: rke2-worker-daniel-pirvu-01
     green: rke2-worker-daniel-pirvu-02
@@ -28,15 +28,15 @@ blueGreen:
 # flip traffic with that service's blueGreen.liveColors entry.
 imageTags:
   blue:
-    astrology-api: 2.0.18
-    frontend: 2.0.20
-    payment-api: 2.0.13
-    booking-api: 2.0.13
+    astrology-api: 2.0.20
+    frontend: 2.0.21
+    payment-api: 2.0.15
+    booking-api: 2.0.15
   green:
-    astrology-api: 2.0.19
-    frontend: 2.0.19
-    booking-api: 2.0.14
-    payment-api: 2.0.14
+    astrology-api: 2.0.20
+    frontend: 2.0.21
+    booking-api: 2.0.15
+    payment-api: 2.0.15
 
 replicas: 1
 
