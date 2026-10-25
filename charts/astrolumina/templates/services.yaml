@@ -33,9 +33,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ $svc.name }}-live
+  # Variant label = which Deployment is currently serving traffic.
   namespace: {{ $root.Values.namespace }}
+  # Exposed to Prometheus's kube-state-metrics as `kube_service_labels{...,label_variant="blue|green"}`.
   labels:
-{{ include "astrolumina.labels" (list $svc "" $root) | indent 4 }}
+{{ include "astrolumina.labels" (list $svc $live $root) | indent 4 }}
 spec:
   type: ClusterIP
   sessionAffinity: ClientIP
