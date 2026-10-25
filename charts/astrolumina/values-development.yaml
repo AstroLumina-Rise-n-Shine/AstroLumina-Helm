@@ -23,9 +23,9 @@ blueGreen:
 # so each service can be deployed at its own version.
 devTags:
   frontend: 2.0.21
-  astrology-api: 2.0.20
-  booking-api: 2.0.15
-  payment-api: 2.0.15
+  astrology-api: 2.0.21
+  booking-api: 2.0.16
+  payment-api: 2.0.17
 
 replicas: 1
 
