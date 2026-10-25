@@ -46,7 +46,7 @@ hpa:
   # Extra memory metric, service name -> utilization. Only dev scopes the
   # frontend on memory; staging/production use CPU only.
   memoryUtilization:
-    frontend: 2.0.21
+    frontend: 75
   # No prometheus-adapter on development (ArgoCD-only cluster): drop the
   # inherited Pods metric so the HPAs stay CPU(+memory)-only instead of
   # reporting a permanently-missing custom metric.
