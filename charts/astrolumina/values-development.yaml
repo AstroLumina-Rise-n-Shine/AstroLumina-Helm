@@ -23,9 +23,9 @@ blueGreen:
 # so each service can be deployed at its own version.
 devTags:
   frontend: 2.0.21
-  astrology-api: 2.0.20
-  booking-api: 2.0.15
-  payment-api: 2.0.15
+  astrology-api: 2.0.21
+  booking-api: 2.0.16
+  payment-api: 2.0.17
 
 replicas: 1
 
@@ -46,7 +46,7 @@ hpa:
   # Extra memory metric, service name -> utilization. Only dev scopes the
   # frontend on memory; staging/production use CPU only.
   memoryUtilization:
-    frontend: 75
+    frontend: 2.0.21
   # No prometheus-adapter on development (ArgoCD-only cluster): drop the
   # inherited Pods metric so the HPAs stay CPU(+memory)-only instead of
   # reporting a permanently-missing custom metric.

@@ -28,10 +28,10 @@ blueGreen:
 # flip traffic with that service's blueGreen.liveColors entry.
 imageTags:
   blue:
-    astrology-api: 2.0.20
+    astrology-api: 2.0.21
     frontend: 2.0.21
-    payment-api: 2.0.15
-    booking-api: 2.0.15
+    payment-api: 2.0.17
+    booking-api: 2.0.16
   green:
     astrology-api: 2.0.21
     frontend: 2.0.21
@@ -56,7 +56,7 @@ hpa:
   # Frontend scales on nginx requests/min (sidecar below -> adapter ->
   # frontend_requests_per_minute); the API entries come from values.yaml.
   requestsPerMinute:
-    frontend: 20
+    frontend: 2.0.21
 
 # Nginx metrics for the frontend HPA + ServiceMonitor (sidecar scrapes
 # 127.0.0.1 stub_status and serves :9113 /metrics).
