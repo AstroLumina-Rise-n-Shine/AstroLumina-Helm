@@ -1,6 +1,6 @@
 # Production environment. Same shape as staging plus: 3 replicas, slower
 # probes, HTTPS via the letsencrypt certResolver, HTTP->HTTPS redirect and
-# basic-auth on the Traefik dashboard. Live Stripe keys come from Doppler.
+# basic-auth on the Traefik dashboard. Live Revolut Pay keys come from Doppler.
 environment: production
 namespace: astrolumina-production
 # Values file name (used by NOTES.txt upgrade hints).
