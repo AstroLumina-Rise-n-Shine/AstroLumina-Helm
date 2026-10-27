@@ -28,15 +28,15 @@ blueGreen:
 # flip traffic with that service's blueGreen.liveColors entry.
 imageTags:
   blue:
-    frontend: 2.0.23
-    astrology-api: 2.0.21
-    booking-api: 2.0.16
-    payment-api: 2.0.18
+    frontend: 2.0.24
+    astrology-api: 2.0.22
+    booking-api: 2.0.17
+    payment-api: 2.0.19
   green:
-    frontend: 2.0.23
-    astrology-api: 2.0.21
-    booking-api: 2.0.16
-    payment-api: 2.0.18
+    frontend: 2.0.24
+    astrology-api: 2.0.22
+    booking-api: 2.0.17
+    payment-api: 2.0.19
 
 replicas: 3
 
