@@ -19,8 +19,8 @@ blueGreen:
     booking-api: blue # LIVE
     payment-api: blue # LIVE
   nodeNames:
-    blue: rke2-worker-daniel-pirvu-01
-    green: rke2-worker-daniel-pirvu-02
+    blue: rke2-wk-01
+    green: rke2-wk-02
 
 # Pinned image tags per color (source of truth in git, mirrors the Compose
 # production versions.env — keep them in parity). Same value on both colors =
